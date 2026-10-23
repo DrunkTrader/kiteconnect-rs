@@ -10,8 +10,6 @@ A Rust client for the [Kite Connect API](https://kite.trade/docs/connect/v3/) by
 - **WebSocket ticker**: Connects to `wss://ws.kite.trade` in a background Tokio task, reconnects with exponential backoff, and restores subscriptions.
 - **Redacted secrets**: Redacts tokens, API secrets, and secret query or form fields from `Debug` output and strips query strings from error paths.
 
-The API mirrors [gokiteconnect](https://github.com/zerodha/gokiteconnect) v4. Method names are Go's in snake case, without the `Get` prefix: `GetHoldings` is `holdings`, `GetUserProfile` is `profile`, `PlaceOrder` is `place_order`. Response types use the field names Kite sends.
-
 Version 1.0 is a rewrite and does not share an API with 0.2.x.
 
 ## Install
