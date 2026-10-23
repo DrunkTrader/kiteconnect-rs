@@ -1,106 +1,66 @@
-//! kiteconnect-rs is a rust implementation of the KiteConnect library.
-//! 
-//! The crate is called `kiteconnect` and you can depend of it via cargo:
-//! 
-//! ```ini
-//! [dependencies.kiteconnect]
-//! version = "*"
-//! ```
-//! 
-//! If you want to use the git version:
-//! 
-//! ```ini
-//! [dependencies.kiteconnect]
-//! git = "https://github.com/zerodhatech/kiteconnect-rs"
-//! ```
-//! 
-//! # Basic Operation
-//! 
-//! kiteconnect-rs had both the connect and ticker implementation of the KiteConnect API
-//! 
-//! 
-//! # HTTP API
-//! 
-//! 
-//! 
-//! ```rust,no_run
-//! # extern crate kiteconnect;
-//! extern crate serde_json as json;
-//! 
-//! use kiteconnect::connect::KiteConnect;
-//! 
-//! fn main() {
-//!     let mut kiteconnect = KiteConnect::new("<API-KEY>", "");
-//! 
-//!     // Open browser with this URL and get the request token from the callback
-//!     let loginurl = kiteconnect.login_url();
-//!     println!("{:?}", loginurl);
-//! 
-//!     // Generate access token with the above request token
-//!     let resp = kiteconnect.generate_session("<REQUEST-TOKEN>", "<API-SECRET>");
-//!     // `generate_session` internally sets the access token from the response
-//!     println!("{:?}", resp);
-//! 
-//!     let holdings: json::Value = kiteconnect.holdings().unwrap();
-//!     println!("{:?}", holdings);
-//! # }
-//! ```
-//! 
-//! # Ticker
-//! ```rust, no_run
-//! extern crate kiteconnect;
-//! extern crate serde_json as json;
-//! 
-//! use kiteconnect::ticker::{KiteTicker, KiteTickerHandler, WebSocketHandler};
-//! 
-//! #[derive(Debug)]
-//! struct CustomHandler {
-//!     count: u32
-//! }
-//! 
-//! impl KiteTickerHandler for CustomHandler {
-//!     fn on_open<T>(&mut self, ws: &mut WebSocketHandler<T>)
-//!     where T: KiteTickerHandler {
-//!         // Subscribe to a list of tokens on opening the websocket connection
-//!         ws.subscribe(vec![123456]);
-//!         println!("Fellow on_open callback");
-//!     }
-//!     fn on_ticks<T>(&mut self, ws: &mut WebSocketHandler<T>, tick: Vec<json::Value>)
-//!     where T: KiteTickerHandler {
-//!         println!("{:?}", tick);
-//!         println!("Fellow on_ticks callback");
-//!     }
-//! 
-//!     fn on_close<T>(&mut self, ws: &mut WebSocketHandler<T>)
-//!     where T: KiteTickerHandler {
-//!         println!("Fellow on_close callback");
-//!     }
-//! 
-//!     fn on_error<T>(&mut self, ws: &mut WebSocketHandler<T>)
-//!     where T: KiteTickerHandler {
-//!         println!("Fellow on_error callback");
-//!     }
-//! }
-//! 
-//! fn main() {
-//!     let mut ticker = KiteTicker::new("<API-KEY>", "<ACCESS-TOKEN>");
-//! 
-//!     let custom_handler = CustomHandler {
-//!         count: 0
-//!     };
-//! 
-//!     ticker.connect(custom_handler, None);
-//! 
-//!     loop {}
-//! # }
-//! ```
-//!
-#[cfg(test)]
-extern crate mockito;
-extern crate csv;
-extern crate ws;
-extern crate url;
-extern crate byteorder;
+#![doc = include_str!("../README.md")]
+#![warn(missing_docs)]
 
-pub mod connect;
+mod alerts;
+mod call;
+mod client;
+mod enums;
+/// Error types and the secret-key redaction helpers.
+pub mod error;
+mod gtt;
+mod historical;
+mod http;
+mod margins;
+mod market;
+mod mf;
+mod orders;
+mod portfolio;
+mod request;
+mod secret;
+mod session;
+/// Kite Connect WebSocket ticker.
 pub mod ticker;
+mod time;
+mod user;
+
+pub use call::Call;
+pub use client::{DEFAULT_BASE_URL, KiteConnect, KiteConnectBuilder};
+pub use enums::{Exchange, OrderType, Product, TransactionType, Validity, Variety};
+pub use error::{Error, Result};
+pub use orders::{Order, OrderChild, OrderChildError, OrderParams, OrderResponse, Trade};
+pub use request::{Body, RawResponse, Request};
+pub use secret::{AccessToken, ApiSecret, RefreshToken};
+pub use ticker::{
+    CloseReason, DEFAULT_TICKER_URL, KiteTicker, Mode, Tick, TickerBuilder, TickerEvent,
+    TickerEvents, parse_binary,
+};
+
+pub use alerts::{
+    Alert, AlertBasket, AlertBasketItem, AlertHistory, AlertHistoryMeta, AlertOhlc, AlertOperator,
+    AlertParams, AlertRhsType, AlertStatus, AlertType, BasketCreate, BasketGtt, BasketItemParams,
+    BasketModify, BasketOperation, BasketOrderParams, BasketWrite,
+};
+pub use gtt::{
+    Gtt, GttCondition, GttMeta, GttOrder, GttOrderResult, GttParams, GttResponse, GttResult,
+    GttTrigger, GttTriggerParams,
+};
+pub use historical::Candle;
+pub use margins::{
+    BasketMargins, BasketParams, Charges, ChargesParams, Gst, MarginParams, MarginPnl,
+    OrderCharges, OrderChargesParam, OrderMarginParam, OrderMargins,
+};
+pub use market::{Depth, DepthItem, Instrument, Ohlc, Quote, QuoteLtp, QuoteOhlc};
+pub use mf::{
+    MfHolding, MfInstrument, MfOrder, MfOrderParams, MfOrderResponse, MfSip, MfSipModifyParams,
+    MfSipParams, MfSipResponse, MfTrade,
+};
+pub use portfolio::{
+    AuctionInstrument, ConvertPositionParams, Holding, HoldingAuthParams, HoldingAuthTransferType,
+    HoldingAuthType, HoldingCompact, HoldingSummary, HoldingsAuthInstruments, HoldingsAuthResp,
+    MtfHolding, Position, PositionType, Positions,
+};
+pub use session::{UserSession, UserSessionTokens};
+pub use user::{
+    AllMargins, AvailableMargins, Bank, FullUserMeta, FullUserProfile, Margins, UsedMargins,
+    UserMeta, UserProfile,
+};
