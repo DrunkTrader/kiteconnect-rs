@@ -1004,7 +1004,7 @@ dependencies = [
 
 [[package]]
 name = "kiteconnect"
-version = "0.3.0"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "csv",

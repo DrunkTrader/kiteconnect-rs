@@ -12,7 +12,7 @@ A Rust client for the [Kite Connect API](https://kite.trade/docs/connect/v3/) by
 
 The API mirrors [gokiteconnect](https://github.com/zerodha/gokiteconnect) v4. Method names are Go's in snake case, without the `Get` prefix: `GetHoldings` is `holdings`, `GetUserProfile` is `profile`, `PlaceOrder` is `place_order`. Response types use the field names Kite sends.
 
-Version 0.3 is a rewrite and does not share an API with 0.2.x.
+Version 1.0 is a rewrite and does not share an API with 0.2.x.
 
 ## Install
 
@@ -25,7 +25,7 @@ Or in `Cargo.toml`:
 
 ```toml
 [dependencies]
-kiteconnect = "0.3"
+kiteconnect = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
